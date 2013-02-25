@@ -32,7 +32,7 @@ def hook():
 	if not os.path.exists(project_dir):
 		abort(404)
 	# make a pull
-	subprocess.call(['git', 'push'], stdout=subprocess.PIPE, shell=False, cwd=repo_dir)
+	subprocess.call(['git', 'pull'], stdout=subprocess.PIPE, shell=False, cwd=repo_dir)
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
