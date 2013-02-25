@@ -36,7 +36,8 @@ def hook():
 		abort(404)
 	# make a pull
 	response = subprocess.call(['git', 'pull', repo_url], shell=False, cwd=repo_dir)
-	assert response == 0, "An error occured during pull of %s" % repo_url
+	if response != 0:
+		print "An error occured during pull of %s" % repo_url
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
