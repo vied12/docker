@@ -13,7 +13,7 @@
 	# TODO: Handle branches
 
 from flask import Flask, render_template, request, send_file, Response, abort, session, redirect, url_for
-import json, urllib, os, git, subprocess, sys
+import json, urllib, os, subprocess, sys
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 APP      = Flask(__name__)
@@ -32,7 +32,7 @@ def hook():
 	if not os.path.exists(project_dir):
 		abort(404)
 	# make a pull
-	git.Repo(repo_dir).remotes.origin.pull()
+	subprocess.call(['git', 'push'], stdout=subprocess.PIPE, shell=False, cwd=repo_dir)
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
@@ -59,8 +59,7 @@ if __name__ == '__main__':
 		if not os.path.exists(project_dir):
 			os.makedirs(project_dir)
 			# create repo
-			os.makedirs(repo_dir)
-			git.Git().clone(repo_url, repo_dir)
+			subprocess.call(['git', 'clone', repo_url, repo_dir], stdout=subprocess.PIPE, shell=False)
 			# create config file
 			with open(os.path.join(project_dir, 'config.json'), 'w') as f:
 				f.write(json.dumps({"repo_url":repo_url, "deploy_cmd":deploy_cmd}, indent=4))
