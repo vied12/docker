@@ -33,7 +33,7 @@ def hook():
 		abort(404)
 	# make a pull
 	print 'git pull'
-	subprocess.call(['git', 'pull'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	subprocess.call(['git', 'pull' repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
