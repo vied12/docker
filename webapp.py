@@ -55,7 +55,7 @@ if __name__ == '__main__':
 		project_dir = os.path.join(ROOT_DIR, 'repos', urllib.quote_plus(repo_url))
 		repo_dir    = os.path.join(project_dir, 'repo')
 		if not os.path.exists(os.path.join(ROOT_DIR, 'repos')):
-			os.makedirs(s.path.join(ROOT_DIR, 'repos'))
+			os.makedirs(os.path.join(ROOT_DIR, 'repos'))
 		if not os.path.exists(project_dir):
 			os.makedirs(project_dir)
 			# create repo
