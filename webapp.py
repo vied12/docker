@@ -10,7 +10,10 @@
 # Creation : 25-Feb-2013
 # Last mod : 25-Feb-2013
 # -----------------------------------------------------------------------------
-	# TODO: Handle branches
+	# TODO: 
+	# [ ] Dynamic command
+	# [ ] Check commit messages for instructions (like HardRelease)
+	# [ ] Handle branches
 
 from flask import Flask, render_template, request, send_file, Response, abort, session, redirect, url_for
 import json, urllib, os, subprocess, sys
@@ -32,13 +35,12 @@ def hook():
 	if not os.path.exists(project_dir):
 		abort(404)
 	# make a pull
-	print 'git pull'
-	subprocess.call(['git', 'pull' repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	response = subprocess.call(['git', 'pull' repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	assert response == 0, "An error occured during pull of", repo_url
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
-	print 'fab dev'
-	response   = subprocess.call(['fab', 'dev'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	response   = subprocess.call(['fab', 'dev:True'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
 	return json.dumps({'status':response == 0})
 
 # -----------------------------------------------------------------------------
