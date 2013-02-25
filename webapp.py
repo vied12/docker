@@ -35,12 +35,12 @@ def hook():
 	if not os.path.exists(project_dir):
 		abort(404)
 	# make a pull
-	response = subprocess.call(['git', 'pull' repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	response = subprocess.call(['git', 'pull', repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
 	assert response == 0, "An error occured during pull of", repo_url
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
-	response   = subprocess.call(['fab', 'dev:True'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
+	response = subprocess.call(['fab', 'dev:True'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, cwd=repo_dir)
 	return json.dumps({'status':response == 0})
 
 # -----------------------------------------------------------------------------
