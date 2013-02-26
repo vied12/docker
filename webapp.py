@@ -14,6 +14,7 @@
 	# [ ] Dynamic command
 	# [ ] Check commit messages for instructions (like HardRelease)
 	# [ ] Handle branches
+	# [ ] one by one
 
 from flask import Flask, render_template, request, send_file, Response, abort, session, redirect, url_for
 import json, urllib, os, subprocess, sys
@@ -29,6 +30,8 @@ APP      = Flask(__name__)
 
 @APP.route('/hook/', methods=('POST', 'GET'))
 def hook():
+	if not request.method == 'POST':
+		abort(404)
 	repo_url    = request.args.get('repo_url')
 	project_dir = os.path.join(ROOT_DIR, 'repos', urllib.quote_plus(repo_url))
 	repo_dir    = os.path.join(project_dir, 'repo')
@@ -41,7 +44,17 @@ def hook():
 	conf       = json.load(file(os.path.join(project_dir, 'config.json')))
 	deploy_cmd = conf.get('deploy_cmd')
 	# launch command
-	response = subprocess.call(['fab', 'dev:True'], shell=False, cwd=repo_dir)
+	response = subprocess.call(deploy_cmd.split(), shell=False, cwd=repo_dir)
+	# search for key words in commit messages
+	payload     = json.loads(request.form.values()[0])
+	commit_msgs = [_.get("message", "") for _ in payload.get('commits')]
+	commands_to_launch = dict()
+	for msg in commit_msgs:
+		for trigger, cmd in conf.get('triggers', dict()).items():
+			if trigger in msg:
+				commands_to_launch[trigger] = cmd
+	for command in commands_to_launch.values():
+		subprocess.call(command.split(), shell=False, cwd=repo_dir)
 	return json.dumps({'status':response == 0})
 
 # -----------------------------------------------------------------------------
